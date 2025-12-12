@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quarkus LangChain4J Agent with Oracle AI Database 26ai</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #response {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+        }
+        #response.show {
+            display: block;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Quarkus LangChain4J Agent with Oracle AI Database 26ai</h2>
+        <form id="agentForm">
+            <label for="prompt">Enter your prompt:</label>
+            <textarea id="prompt" name="prompt" placeholder="Example: A customer reported an Oracle Database error code ORA-00054. Send an email to customer@cybernetics.com with the error description, possible root causes, and solutions." required></textarea>
+            <button type="submit" id="submitBtn">Submit</button>
+        </form>
+        <div id="response"></div>
+    </div>
+
+    <script>
+        document.getElementById('agentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const prompt = document.getElementById('prompt').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const responseDiv = document.getElementById('response');
+            
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            responseDiv.className = '';
+            responseDiv.textContent = 'Processing your request...';
+            responseDiv.classList.add('show');
+            
+            try {
+                const response = await fetch('/agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: prompt
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const responseText = await response.text();
+                responseDiv.textContent = responseText;
+                responseDiv.className = 'show';
+            } catch (error) {
+                responseDiv.textContent = 'Error: ' + error.message;
+                responseDiv.className = 'show error';
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+            }
+        });
+    </script>
+</body>
+</html>
+
